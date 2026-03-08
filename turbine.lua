@@ -44,7 +44,6 @@ while true do
 	
 	os.execute('clear') -- Очищаем экран
 	
-	-- Первая турбина
 	for index, value in ipairs(turbines_data) do
 		print("Турбина ", index)
 		if value['status'] == 1 then
@@ -73,3 +72,4 @@ while true do
 	
 	os.sleep(2.5) -- Ждём
 end -- Конец основного цикла
+
