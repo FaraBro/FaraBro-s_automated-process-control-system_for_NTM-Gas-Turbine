@@ -1,18 +1,33 @@
-component = require('component')
+-- Настройки
+settings = {
+	outputInfo_To_Console = false, -- Вывод информации о турбинах в консоль, может снизить производительность системы и повысить потребление энергии при включении
+	AutoSearchTurbines = true, -- Автоматический поиск турбин комб. цикла
+}
 
--- Турбины
-
--- Адреса турбин
+-- Адресы турбин
 turbines_address = {
 	'', -- Адрес турбины №1
 	'', -- Адрес турбины №2
-	'', -- и так далее P.S. можно от 1 до 64 турбин (ограничивается сервером OpenComputers и вашим компьютером)
+	'', -- и так далее P.S. можно от 0 до Inf турбин (ограничивается сервером OpenComputers и вашим компьютером)
 }
 
--- Импортируем адреса турбин
+timeOfSleep = 2.5 -- Время ожидания после цикла
+
+component = require('component')
+
+-- Импортируем адресы турбин
 turbines = {}
-for index, value in ipairs(turbines_address) do
-	turbines[index] = component.proxy(component.get(value))
+if (settings.AutoSearchTurbines==false) then
+	for index, value in ipairs(turbines_address) do
+		turbines[index] = component.proxy(component.get(value))
+	end
+else
+	numb = 1
+	turbines_list = component.list("ntm_gas_turbine")
+	for key, value in pairs(turbines_list) do
+		turbines[numb] = component.proxy(key)
+		numb = numb + 1
+	end
 end
 
 -- Основной цикл
@@ -42,34 +57,36 @@ while true do
 	
 	-- Вывод
 	
-	os.execute('clear') -- Очищаем экран
-	
-	for index, value in ipairs(turbines_data) do
-		print("Турбина ", index)
-		if value['status'] == 1 then
-			print("	Мощность: ", value['power'])
-			print("	Статус: 	Работает")
-			print("	Топливо: ", value['fuel'], " / ", value['max_fuel'])
-			print("	Смазка: ", value['lubricant'], " / ", value['max_lubricant'])
-			print("	Вода: 	", value['water'], " / ", value['max_water'])
-			print("	Пар: 	", value['steam'], " / ", value['max_steam'])
-		elseif value['status'] == 0 then
-			print("	Статус: 	Остановлена")
-			if value['fuel'] == 0 and value['lubricant'] == 0 then
-				print("	Возможная причина: Нехватка топлива и смазки")
-			elseif value['fuel'] == 0 then
-				print("	Возможная причина: Нехватка топлива")
-			elseif value['lubricant'] == 0 then
-				print("	Возможная причина: Нехватка смазки")
+	if (settings.outputInfo_To_Console==true) then
+		os.execute('clear') -- Очищаем экран
+		
+		for index, value in ipairs(turbines_data) do
+			print("Турбина ", index)
+			if value['status'] == 1 then
+				print("	Мощность: ", value['power'])
+				print("	Статус: 	Работает")
+				print("	Топливо: ", value['fuel'], " / ", value['max_fuel'])
+				print("	Смазка: ", value['lubricant'], " / ", value['max_lubricant'])
+				print("	Вода: 	", value['water'], " / ", value['max_water'])
+				print("	Пар: 	", value['steam'], " / ", value['max_steam'])
+			elseif value['status'] == 0 then
+				print("	Статус: 	Остановлена")
+				if value['fuel'] == 0 and value['lubricant'] == 0 then
+					print("	Возможная причина: Нехватка топлива и смазки")
+				elseif value['fuel'] == 0 then
+					print("	Возможная причина: Нехватка топлива")
+				elseif value['lubricant'] == 0 then
+					print("	Возможная причина: Нехватка смазки")
+				end
+			else
+				print("	Статус: 	Запускается")
 			end
-		else
-			print("	Статус: 	Запускается")
+			print()
 		end
-		print()
 	end
 	
 	-- Конец вывода
 	
-	os.sleep(2.5) -- Ждём
+	os.sleep(timeOfSleep) -- Ждём
 end -- Конец основного цикла
 
