@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 FaraBro
+-- SPDX-License-Identifier: MIT OR Apache-2.0
+
 -- Настройки
 settings = {
 	outputInfo_To_Console = false, -- Вывод информации о турбинах в консоль, может снизить производительность системы и повысить потребление энергии при включении
@@ -198,4 +201,3 @@ while true do
 	
 	os.sleep(timeOfSleep) -- Ждём
 end -- Конец основного цикла
-
